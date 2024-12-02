@@ -33,13 +33,15 @@ namespace GDGHackathon.DAL.Repository
         public async Task AddAsync(TEntity entity)
         {
             await _context.AddAsync(entity);
+            await _context.SaveChangesAsync();
 
         }
 
         public async Task UpdateAsync(TEntity entity)
         {
-            _context.Update(entity); 
+            _context.Update(entity);
             await _context.SaveChangesAsync();
+
         }
 
         public async Task DeleteAsync(TEntity entity)

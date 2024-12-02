@@ -15,9 +15,7 @@ namespace GDGHackathon.BLL.Dtos
         public DateTime HarvestDate { get; set; }
         public string ImageUrl { get; set; }
 
-        [ForeignKey("Farmer")]
-        public string FarmerId { get; set; }
-
+       
 
     }
 }

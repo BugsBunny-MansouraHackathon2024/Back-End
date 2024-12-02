@@ -29,6 +29,7 @@ namespace GDGHackathon.API
                 .AddDefaultTokenProviders();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
             builder.Services.AddControllers();

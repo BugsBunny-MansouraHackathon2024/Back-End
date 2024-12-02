@@ -56,14 +56,13 @@ namespace GDGHackathon.API.Controllers
         }
 
         // POST: api/products
-        [Authorize(Roles = "Farmer")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductDto productDto)
         {
             // Get the logged-in user's ID
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-                return Unauthorized("User is not authenticated.");
+            //if (userId == null)
+            //    return Unauthorized("User is not authenticated.");
 
             if (productDto == null)
                     return BadRequest("Product is null.");
@@ -77,7 +76,7 @@ namespace GDGHackathon.API.Controllers
                     HarvestDate = productDto.HarvestDate,
                     Quantity = productDto.Quantity,
                     ImageUrl = productDto.ImageUrl,
-                    FarmerId = farmer.Id,
+                    FarmerId = "b5f51174-dffc-4804-b64f-494fae3e8dad",
                 };
                 await _unitOfWork.Product.AddAsync(product);
                 return CreatedAtAction(nameof(GetById), new { id = product.Id }, new {message="successfully created"});
