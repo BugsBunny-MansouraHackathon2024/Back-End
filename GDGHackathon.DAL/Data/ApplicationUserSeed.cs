@@ -19,7 +19,7 @@ namespace GDGHackathon.DAL.Data
                     Email = "Admin@gmail.com",
                     UserName = "Admin",
                     PhoneNumber = "010000000000",
-                    Location = "Mansoura",
+                    Address = "Mansoura",
                     Role="Farmer"
 
                 };

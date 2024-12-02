@@ -15,14 +15,16 @@ namespace GDGHackathon.DAL.Entities
         public string Name { get; set; }
          
         public int Quantity { get; set; }
-        public decimal PricePerUnit { get; set; }
-        public string Description { get; set; }
+        public decimal Price { get; set; }
         public DateTime HarvestDate { get; set; }
+        public DateTime CreatedAt { get; set; }= DateTime.Now;
         public string ImageUrl { get; set; }
 
         [ForeignKey("Farmer")]
-        public string? FarmerId { get; set; }
-        public ApplicationUser Farmer { get; set; }
-        
+        public string FarmerId { get; set; }
+        public ApplicationUser? Farmer { get; set; }
+        public ICollection<Order> Orders { get; set; } // Orders that contain this product
+
+
     }
 }

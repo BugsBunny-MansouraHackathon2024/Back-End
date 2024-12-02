@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GDGHackathon.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241201121401_AddProductTables")]
-    partial class AddProductTables
+    [Migration("20241202062439_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,12 +33,12 @@ namespace GDGHackathon.DAL.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -46,10 +46,6 @@ namespace GDGHackathon.DAL.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -84,9 +80,6 @@ namespace GDGHackathon.DAL.Data.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -104,6 +97,75 @@ namespace GDGHackathon.DAL.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FarmerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityOrdered")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WholesalerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FarmerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("WholesalerId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("GDGHackathon.DAL.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -112,9 +174,8 @@ namespace GDGHackathon.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("FarmerId")
                         .IsRequired()
@@ -131,7 +192,7 @@ namespace GDGHackathon.DAL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PricePerUnit")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
@@ -142,6 +203,76 @@ namespace GDGHackathon.DAL.Data.Migrations
                     b.HasIndex("FarmerId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Rating", b =>
+                {
+                    b.Property<int>("RatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RatingId"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RatedByUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RatedUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RatingValue")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.HasIndex("RatedByUserId");
+
+                    b.HasIndex("RatedUserId");
+
+                    b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Shipment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ShipmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShippingCompanyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("ShippingCompanyId");
+
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -277,15 +408,91 @@ namespace GDGHackathon.DAL.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Order", b =>
+                {
+                    b.HasOne("GDGHackathon.DAL.Entities.Identity.ApplicationUser", "Farmer")
+                        .WithMany("ReceivedOrders")
+                        .HasForeignKey("FarmerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GDGHackathon.DAL.Entities.Product", "Product")
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GDGHackathon.DAL.Entities.Identity.ApplicationUser", "Wholesaler")
+                        .WithMany("PlacedOrders")
+                        .HasForeignKey("WholesalerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Farmer");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Wholesaler");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Payment", b =>
+                {
+                    b.HasOne("GDGHackathon.DAL.Entities.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("GDGHackathon.DAL.Entities.Payment", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("GDGHackathon.DAL.Entities.Product", b =>
                 {
                     b.HasOne("GDGHackathon.DAL.Entities.Identity.ApplicationUser", "Farmer")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("FarmerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Farmer");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Rating", b =>
+                {
+                    b.HasOne("GDGHackathon.DAL.Entities.Identity.ApplicationUser", "RatedByUser")
+                        .WithMany("RatingsGiven")
+                        .HasForeignKey("RatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GDGHackathon.DAL.Entities.Identity.ApplicationUser", "RatedUser")
+                        .WithMany("RatingsReceived")
+                        .HasForeignKey("RatedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RatedByUser");
+
+                    b.Navigation("RatedUser");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Shipment", b =>
+                {
+                    b.HasOne("GDGHackathon.DAL.Entities.Order", "Order")
+                        .WithOne("Shipment")
+                        .HasForeignKey("GDGHackathon.DAL.Entities.Shipment", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GDGHackathon.DAL.Entities.Identity.ApplicationUser", "ShippingCompany")
+                        .WithMany("Shipments")
+                        .HasForeignKey("ShippingCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("ShippingCompany");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -337,6 +544,35 @@ namespace GDGHackathon.DAL.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("PlacedOrders");
+
+                    b.Navigation("Products");
+
+                    b.Navigation("RatingsGiven");
+
+                    b.Navigation("RatingsReceived");
+
+                    b.Navigation("ReceivedOrders");
+
+                    b.Navigation("Shipments");
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Order", b =>
+                {
+                    b.Navigation("Payment")
+                        .IsRequired();
+
+                    b.Navigation("Shipment")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GDGHackathon.DAL.Entities.Product", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

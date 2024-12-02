@@ -55,7 +55,7 @@ namespace GDGHackathon.BLL.Users
                 Email = registerDto.Email,
                 UserName = registerDto.UserName,
                 PhoneNumber = registerDto.PhoneNumber,
-                Location = registerDto.Address,
+                Address = registerDto.Address,
                 Role=registerDto.Role,
             };
 
