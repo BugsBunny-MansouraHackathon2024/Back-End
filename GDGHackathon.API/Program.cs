@@ -38,7 +38,7 @@ namespace GDGHackathon.API
             {
                 options.AddPolicy("AllowSpecificOrigin", policy =>
                 {
-                    policy.WithOrigins("https://localhost:7019/")  // Add the allowed origin(s)
+                    policy.WithOrigins("http://gouzourapi.runasp.net/")  // Replace with the correct origin
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
@@ -90,11 +90,11 @@ namespace GDGHackathon.API
             }
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+            //if (app.Environment.IsDevelopment())
+            //{
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            //}
             app.UseStaticFiles();
             app.UseHttpsRedirection();
             app.UseAuthentication();

@@ -1,10 +1,13 @@
 ﻿using GDGHackathon.BLL.Dtos;
 using GDGHackathon.DAL.Entities;
 using GDGHackathon.DAL.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GDGHackathon.API.Controllers
@@ -13,11 +16,11 @@ namespace GDGHackathon.API.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _productRepo;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductsController(IProductRepository productRepo)
+        public ProductsController(IUnitOfWork unitOfWork)
         {
-            _productRepo = productRepo;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/products
@@ -26,7 +29,7 @@ namespace GDGHackathon.API.Controllers
         {
             try
             {
-                var products = await _productRepo.GetAllAsync();
+                var products = await _unitOfWork.Product.GetAllAsync();
                 return Ok(products);
             }
             catch (Exception ex)
@@ -41,7 +44,7 @@ namespace GDGHackathon.API.Controllers
         {
             try
             {
-                var product = await _productRepo.GetByIdAsync(id);
+                var product = await _unitOfWork.Product.GetByIdAsync(id);
                 if (product == null)
                     return NotFound($"Product with ID {id} not found.");
                 return Ok(product);
@@ -53,22 +56,30 @@ namespace GDGHackathon.API.Controllers
         }
 
         // POST: api/products
+        [Authorize(Roles = "Farmer")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductDto productDto)
         {
-           
-                if (productDto == null)
+            // Get the logged-in user's ID
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized("User is not authenticated.");
+
+            if (productDto == null)
                     return BadRequest("Product is null.");
-                var product = new Product()
+
+            var farmer = await _unitOfWork.UserApp.GetByIdAsync(userId );
+
+            var product = new Product()
                 {
                     Name = productDto.Name,
                     Price = productDto.Price,
                     HarvestDate = productDto.HarvestDate,
                     Quantity = productDto.Quantity,
                     ImageUrl = productDto.ImageUrl,
-                    FarmerId = productDto.FarmerId,
+                    FarmerId = farmer.Id,
                 };
-                await _productRepo.AddAsync(product);
+                await _unitOfWork.Product.AddAsync(product);
                 return CreatedAtAction(nameof(GetById), new { id = product.Id }, new {message="successfully created"});
             
         }
@@ -80,7 +91,7 @@ namespace GDGHackathon.API.Controllers
             try
             {
           
-                var existingProduct = await _productRepo.GetByIdAsync(id);
+                var existingProduct = await _unitOfWork.Product.GetByIdAsync(id);
                 if (existingProduct == null)
                     return NotFound($"Product with ID {id} not found.");
                
@@ -91,7 +102,7 @@ namespace GDGHackathon.API.Controllers
                     existingProduct.ImageUrl = productUpdateDto.ImageUrl;
                     
 
-                await _productRepo.UpdateAsync(existingProduct);
+                await _unitOfWork.Product.UpdateAsync(existingProduct);
                 return NoContent(); // 204 No Content indicates successful update
             }
             catch (Exception ex)
@@ -106,11 +117,11 @@ namespace GDGHackathon.API.Controllers
         {
             try
             {
-                var product = await _productRepo.GetByIdAsync(id);
+                var product = await _unitOfWork.Product.GetByIdAsync(id);
                 if (product == null)
                     return NotFound($"Product with ID {id} not found.");
 
-                await _productRepo.DeleteAsync(product);
+                await _unitOfWork.Product.DeleteAsync(product);
                 return NoContent(); // 204 No Content
             }
             catch (Exception ex)

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GDGHackathon.DAL.Repository
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity,TKey> : IGenericRepository<TEntity,TKey> where TEntity : class
     {
         private readonly ApplicationDbContext _context;
 
@@ -25,10 +25,9 @@ namespace GDGHackathon.DAL.Repository
             return await _context.Set<TEntity>().ToListAsync();
         }
 
-        public async Task<TEntity> GetAsync(int id)
+        public async Task<TEntity> GetByIdAsync(TKey id)
         {
-           
-            return await _context.Set<TEntity>().FindAsync(id);
+             return await _context.Set<TEntity>().FindAsync(id);
         }
 
         public async Task AddAsync(TEntity entity)
@@ -37,14 +36,16 @@ namespace GDGHackathon.DAL.Repository
 
         }
 
-        public void Update(TEntity entity)
+        public async Task UpdateAsync(TEntity entity)
         {
-            _context.Update(entity);
+            _context.Update(entity); 
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(TEntity entity)
+        public async Task DeleteAsync(TEntity entity)
         {
-            _context.Remove(entity);
+              _context.Remove(entity);
+            await _context.SaveChangesAsync();
         }
 
        
